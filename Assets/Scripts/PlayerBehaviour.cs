@@ -1,46 +1,50 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    // Base movement variables
     public float MovementSpeed;
     public Rigidbody2D Rigidbody2D;
     private Vector2 MovementDirection;
 
-    private float ActiveMovementSpeed;
+    // Dash variables
+    private float _activeMovementSpeed;
     public float DashSpeed;
-    public float DashLength = .5f, DashCooldown = 1f;
+    public float DashLength = 0.5f, DashCooldown = 1f;
+    private float _dashCounter;
+    private float _dashCoolCounter;
 
-    private float DashCounter;
-    private float DashCoolCounter;
-
+    // Go back in time variables
     public TrailRenderer TrailRenderer;
-    
-    private Vector2 GoBackInTimePosition;
-    private bool GoBackInTimePositionSet;
+    private bool _goBackInTimePositionSet;
+    // private Vector3[] _waypoints;
+    // private int _waypointIndex;
+    private bool _goingBackInTime;
+    private Vector2 _goBackInTimePosition;
+    private float _goBackInTimeTimer = 10f;
 
-    private Vector3[] Waypoints;
-    private int WaypointIndex;
-    private bool GoingBackInTime;
-    
-    private float GoBackInTimeTimer = 10f;
-    
+    private Vector2 _timeshiftSpeed = Vector2.zero;
+    public float LerpTime = 0.5f;
+    private float _currentLerpTime = 0f;
     private void Start()
     {
-        ActiveMovementSpeed = MovementSpeed;
+        _activeMovementSpeed = MovementSpeed;
     }
 
     void Update()
     {
-        if(!GoingBackInTime) GetInputs();
+        if(!_goingBackInTime) GetInputs();
     }
 
     void FixedUpdate()
     {
-        if (GoingBackInTime)
+        if (_goingBackInTime)
         {
             GoBackInTime();
         }
@@ -53,45 +57,51 @@ public class PlayerBehaviour : MonoBehaviour
 
     void SetBackInTime()
     {
-        GoBackInTimeTimer -= Time.fixedDeltaTime;
+        _goBackInTimeTimer -= Time.fixedDeltaTime;
         
-        if (GoBackInTimeTimer <= 5 && !GoBackInTimePositionSet )
+        if (_goBackInTimeTimer <= 5 && !_goBackInTimePositionSet )
         {
-            GoBackInTimePosition = transform.position;
-            GoBackInTimePositionSet = true;
-
+            _goBackInTimePosition = Rigidbody2D.position;
+            _goBackInTimePositionSet = true;
             TrailRenderer.enabled = true;
         }
 
-        if (GoBackInTimeTimer <= 0)
+        if (_goBackInTimeTimer <= 0)
         {
-            var positionCount = TrailRenderer.positionCount;
-            
-            WaypointIndex = positionCount - 1;
-            Waypoints = new Vector3[positionCount];
-            TrailRenderer.GetPositions(Waypoints);
+            // var positionCount = TrailRenderer.positionCount;
+            // _waypointIndex = positionCount - 1;
+            // _waypoints = new Vector3[positionCount];
+            // TrailRenderer.GetPositions(_waypoints);
             
             // TrailRenderer.enabled = false;
             
-            GoingBackInTime = true;
+            _goingBackInTime = true;
         }
     }
 
     void GoBackInTime()
     {
-        if (Waypoints[WaypointIndex] == transform.position)
+        _currentLerpTime += Time.deltaTime;
+        if (_currentLerpTime > LerpTime)
         {
-            WaypointIndex--;
+            _currentLerpTime = LerpTime;
         }
+        
+        float xAxis = _currentLerpTime / LerpTime;
+        Vector2 position = Vector2.Lerp(Rigidbody2D.position, _goBackInTimePosition, xAxis);
+        Rigidbody2D.MovePosition(position);
 
-        transform.position = Vector3.MoveTowards(transform.position, Waypoints[WaypointIndex], Time.time);
-
-        if (WaypointIndex == 0)
+        if (_goBackInTimePosition == Rigidbody2D.position)
         {
-            GoBackInTimeTimer = 10f;
-            GoBackInTimePositionSet = false;
-            GoingBackInTime = false;
+            _goBackInTimeTimer = 10f;
+            _goBackInTimePositionSet = false;
+            _goingBackInTime = false;
+            _currentLerpTime = 0f;
+
+            TrailRenderer.Clear();
+            TrailRenderer.enabled = false;
         }
+        
     }
 
     void GetInputs()
@@ -99,31 +109,31 @@ public class PlayerBehaviour : MonoBehaviour
         MovementDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (DashCounter <= 0 && DashCoolCounter <= 0)
+            if (_dashCounter <= 0 && _dashCoolCounter <= 0)
             {
-                ActiveMovementSpeed = DashSpeed;
-                DashCounter = DashLength;
+                _activeMovementSpeed = DashSpeed;
+                _dashCounter = DashLength;
             }
         }
     }
 
     void Move()
     {
-        Rigidbody2D.velocity = new Vector2(MovementDirection.x * ActiveMovementSpeed, MovementDirection.y * ActiveMovementSpeed);
+        Rigidbody2D.velocity = MovementDirection * _activeMovementSpeed;
 
-        if (DashCounter > 0)
+        if (_dashCounter > 0)
         {
-            DashCounter -= Time.fixedDeltaTime;
-            if (DashCounter <= 0)
+            _dashCounter -= Time.fixedDeltaTime;
+            if (_dashCounter <= 0)
             {
-                ActiveMovementSpeed = MovementSpeed;
-                DashCoolCounter = DashCooldown;
+                _activeMovementSpeed = MovementSpeed;
+                _dashCoolCounter = DashCooldown;
             }
         }
 
-        if (DashCoolCounter > 0)
+        if (_dashCoolCounter > 0)
         {
-            DashCoolCounter -= Time.fixedDeltaTime;
+            _dashCoolCounter -= Time.fixedDeltaTime;
         }
     }
 }
