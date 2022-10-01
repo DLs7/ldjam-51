@@ -23,8 +23,6 @@ public class PlayerBehaviour : MonoBehaviour
     // Go back in time variables
     public TrailRenderer TrailRenderer;
     private bool _goBackInTimePositionSet;
-    // private Vector3[] _waypoints;
-    // private int _waypointIndex;
     private bool _goingBackInTime;
     private Vector2 _goBackInTimePosition;
     private float _goBackInTimeTimer = 10f;
