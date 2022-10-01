@@ -30,7 +30,7 @@ public class PlayerBehaviour : MonoBehaviour
     private float _goBackInTimeTimer = 10f;
 
     private Vector2 _timeshiftSpeed = Vector2.zero;
-    public float LerpTime = 0.5f;
+    public float LerpTime = 0.75f;
     private float _currentLerpTime = 0f;
     private void Start()
     {
@@ -68,13 +68,6 @@ public class PlayerBehaviour : MonoBehaviour
 
         if (_goBackInTimeTimer <= 0)
         {
-            // var positionCount = TrailRenderer.positionCount;
-            // _waypointIndex = positionCount - 1;
-            // _waypoints = new Vector3[positionCount];
-            // TrailRenderer.GetPositions(_waypoints);
-            
-            // TrailRenderer.enabled = false;
-            
             _goingBackInTime = true;
         }
     }
