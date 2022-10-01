@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class PlayerBehaviour : MonoBehaviour
@@ -16,20 +17,81 @@ public class PlayerBehaviour : MonoBehaviour
     private float DashCounter;
     private float DashCoolCounter;
 
+    public TrailRenderer TrailRenderer;
+    
+    private Vector2 GoBackInTimePosition;
+    private bool GoBackInTimePositionSet;
+
+    private Vector3[] Waypoints;
+    private int WaypointIndex;
+    private bool GoingBackInTime;
+    
+    private float GoBackInTimeTimer = 10f;
+    
     private void Start()
     {
         ActiveMovementSpeed = MovementSpeed;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        GetInputs();
+        if(!GoingBackInTime) GetInputs();
     }
 
     void FixedUpdate()
     {
-        Move();
+        if (GoingBackInTime)
+        {
+            GoBackInTime();
+        }
+        else
+        {
+            SetBackInTime();
+            Move();
+        }
+    }
+
+    void SetBackInTime()
+    {
+        GoBackInTimeTimer -= Time.fixedDeltaTime;
+        
+        if (GoBackInTimeTimer <= 5 && !GoBackInTimePositionSet )
+        {
+            GoBackInTimePosition = transform.position;
+            GoBackInTimePositionSet = true;
+
+            TrailRenderer.enabled = true;
+        }
+
+        if (GoBackInTimeTimer <= 0)
+        {
+            var positionCount = TrailRenderer.positionCount;
+            
+            WaypointIndex = positionCount - 1;
+            Waypoints = new Vector3[positionCount];
+            TrailRenderer.GetPositions(Waypoints);
+            
+            // TrailRenderer.enabled = false;
+            
+            GoingBackInTime = true;
+        }
+    }
+
+    void GoBackInTime()
+    {
+        if (Waypoints[WaypointIndex] == transform.position)
+        {
+            WaypointIndex--;
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, Waypoints[WaypointIndex], Time.time);
+
+        if (WaypointIndex == 0)
+        {
+            GoBackInTimeTimer = 10f;
+            GoBackInTimePositionSet = false;
+            GoingBackInTime = false;
+        }
     }
 
     void GetInputs()
