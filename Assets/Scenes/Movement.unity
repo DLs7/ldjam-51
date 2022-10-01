@@ -161,6 +161,7 @@ MonoBehaviour:
   DashLength: 0.5
   DashCooldown: 0.5
   TrailRenderer: {fileID: 622177007}
+  LerpTime: 0.5
 --- !u!50 &622177004
 Rigidbody2D:
   serializedVersion: 4
@@ -169,7 +170,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 622177002}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -498,4 +499,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 622177006}
-  Damping: 0.5
+  Offset: {x: 0, y: 0, z: 0}
+  Damping: 0.1
