@@ -220,7 +220,6 @@ GameObject:
   - component: {fileID: 622177004}
   - component: {fileID: 622177003}
   - component: {fileID: 622177007}
-  - component: {fileID: 622177008}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -240,14 +239,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3bc423a73977581394a754908209d7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MovementSpeed: 5
   Rigidbody2D: {fileID: 622177004}
   Camera: {fileID: 2031696555}
+  MovementSpeed: 5
   DashSpeed: 10
   DashLength: 0.5
   DashCooldown: 0.5
   TrailRenderer: {fileID: 622177007}
   LerpTime: 0.75
+  Firepoint: {fileID: 25137736}
+  Fireball: {fileID: 8781868302835058921, guid: 7cc10dba14c258be6a07b9f1f4f6511f, type: 3}
+  FireballForce: 20
 --- !u!50 &622177004
 Rigidbody2D:
   serializedVersion: 4
@@ -454,21 +456,6 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
---- !u!114 &622177008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 622177002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 512865cd4acdd693fab9ea23054ba9a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Firepoint: {fileID: 25137736}
-  Fireball: {fileID: 8781868302835058921, guid: 7cc10dba14c258be6a07b9f1f4f6511f, type: 3}
-  FireballForce: 20
 --- !u!1 &2031696552
 GameObject:
   m_ObjectHideFlags: 0

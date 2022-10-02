@@ -14,21 +14,27 @@ namespace Player
         private Vector2 AimDirection;
 
         // Dash variables
-        private float _activeMovementSpeed;
         public float DashSpeed = 10f;
         public float DashLength = 0.5f, DashCooldown = 1f;
+        private float _activeMovementSpeed;
         private float _dashCounter;
         private float _dashCoolCounter;
 
         // Go back in time variables
         public TrailRenderer TrailRenderer;
         private bool _goBackInTimePositionSet;
-        [HideInInspector] public bool GoingBackInTime;
+        private bool GoingBackInTime;
         private Vector2 _goBackInTimePosition;
         private float _goBackInTimeTimer = 10f;
-
         public float LerpTime = 0.75f;
         private float _currentLerpTime = 0f;
+        
+        // Shoot variables
+        public Transform Firepoint;
+        public GameObject Fireball;
+
+        public float FireballForce = 20f;
+        
         private void Start()
         {
             _activeMovementSpeed = MovementSpeed;
@@ -36,7 +42,10 @@ namespace Player
 
         void Update()
         {
-            if(!GoingBackInTime) GetInputs();
+            if (!GoingBackInTime)
+            {
+                GetInputs();
+            }
         }
 
         void FixedUpdate()
@@ -99,6 +108,11 @@ namespace Player
             MovementDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
             AimDirection = Camera.ScreenToWorldPoint(Input.mousePosition);
         
+            if (Input.GetButtonDown("Fire1"))
+            {
+                Shoot();
+            }
+            
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 if (_dashCounter <= 0 && _dashCoolCounter <= 0)
@@ -114,7 +128,7 @@ namespace Player
             Rigidbody2D.velocity = MovementDirection * _activeMovementSpeed;
 
             Vector2 firepointDirection = AimDirection - Rigidbody2D.position;
-            float angle = Mathf.Atan2(firepointDirection.y, firepointDirection.x) * Mathf.Rad2Deg - 90f;
+            float angle = Mathf.Atan2(firepointDirection.y, firepointDirection.x) * Mathf.Rad2Deg;
             Rigidbody2D.rotation = angle;
         
             if (_dashCounter > 0)
@@ -131,6 +145,13 @@ namespace Player
             {
                 _dashCoolCounter -= Time.fixedDeltaTime;
             }
+        }
+        
+        void Shoot()
+        {
+            GameObject fireball = Instantiate(Fireball, Firepoint.position, Firepoint.rotation);
+            Rigidbody2D rigidbody2D = fireball.GetComponent<Rigidbody2D>();
+            rigidbody2D.AddForce(Firepoint.up * FireballForce, ForceMode2D.Impulse);
         }
     }
 }
