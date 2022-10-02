@@ -34,6 +34,14 @@ namespace Player
         public GameObject Fireball;
 
         public float FireballForce = 20f;
+
+        private bool isInvencible = false;
+
+        private float timerInvencibility = 0;
+
+        private float invencibilityCooldown = 1f; 
+
+        private int life = 3;
         
         private void Start()
         {
@@ -42,6 +50,10 @@ namespace Player
 
         void Update()
         {
+            CheckLife();
+            if (isInvencible){
+                UpdateTimerInvecibility();
+            }
             if (!GoingBackInTime)
             {
                 GetInputs();
@@ -153,5 +165,30 @@ namespace Player
             Rigidbody2D rigidbody2D = fireball.GetComponent<Rigidbody2D>();
             rigidbody2D.AddForce(Firepoint.up * FireballForce, ForceMode2D.Impulse);
         }
+
+        void UpdateTimerInvecibility(){
+            timerInvencibility += Time.deltaTime;
+            if (timerInvencibility >= invencibilityCooldown){
+                isInvencible = false;
+                timerInvencibility = 0;
+            }
+        }
+
+        void CheckLife(){
+            if (life <= 0){
+                Debug.Log("You lose, call the ending scene!");
+            }
+        }
+
+        void OnTriggerEnter2D(Collider2D col)
+        {
+            if (col.tag == "Enemy"){
+                if (!isInvencible){
+                    life--;
+                    isInvencible = true;
+                }
+            }
+        }
+
     }
 }
