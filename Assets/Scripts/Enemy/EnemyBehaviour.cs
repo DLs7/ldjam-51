@@ -105,4 +105,12 @@ public class EnemyBehaviour : MonoBehaviour
         Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition, velocity);
         transform.position = newPosition;
     }
+
+    void OnTriggerEnter2D(Collider2D col){
+        Debug.Log(col.tag);
+        if(col.tag == "Projectile"){
+            Destroy(col.gameObject);
+            Destroy(this.gameObject);
+        }
+    }
 }
